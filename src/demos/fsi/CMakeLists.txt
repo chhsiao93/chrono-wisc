@@ -24,6 +24,7 @@ set(DEMOS ${DEMOS}
    benchmark_Acc_FSI_NormalBevameter_GRC1
    benchmark_Acc_FSI_Viper_SingleWheel
    benchmark_Acc_FSI_Rassor_SingleDrum
+   GNS_benchmark_Acc_FSI_Cratering
 )
 
 if(CH_ENABLE_MODULE_PARDISO_MKL)
@@ -51,7 +52,17 @@ endif()
 #--------------------------------------------------------------
 
 message(STATUS "Add demo programs for FSI module")
-	
+
+# Find yaml-cpp for GNS_benchmark_Acc_FSI_Cratering
+find_package(yaml-cpp QUIET)
+if(NOT yaml-cpp_FOUND)
+    find_library(YAML_CPP_LIBRARY NAMES yaml-cpp)
+    if(YAML_CPP_LIBRARY)
+        set(yaml-cpp_FOUND TRUE)
+        message(STATUS "Found yaml-cpp library: ${YAML_CPP_LIBRARY}")
+    endif()
+endif()
+
 foreach(PROGRAM ${DEMOS})
     add_executable(${PROGRAM} ${PROGRAM}.cpp)
     source_group("" FILES ${PROGRAM}.cpp)
@@ -63,9 +74,19 @@ foreach(PROGRAM ${DEMOS})
     if(MSVC)
       set_target_properties(${PROGRAM} PROPERTIES MSVC_RUNTIME_LIBRARY ${CH_MSVC_RUNTIME_LIBRARY})
     endif()
-    
+
     set_property(TARGET ${PROGRAM} PROPERTY VS_DEBUGGER_WORKING_DIRECTORY "$<TARGET_FILE_DIR:${PROGRAM}>")
     target_link_libraries(${PROGRAM} ${LIBS})
+
+    # Add yaml-cpp for GNS_benchmark_Acc_FSI_Cratering
+    if(${PROGRAM} STREQUAL "GNS_benchmark_Acc_FSI_Cratering" AND yaml-cpp_FOUND)
+        if(TARGET yaml-cpp)
+            target_link_libraries(${PROGRAM} yaml-cpp)
+        else()
+            target_link_libraries(${PROGRAM} ${YAML_CPP_LIBRARY})
+        endif()
+        message(STATUS "Linking yaml-cpp to ${PROGRAM}")
+    endif()
 
     install(TARGETS ${PROGRAM} DESTINATION ${CH_INSTALL_DEMO})
 endforeach()
