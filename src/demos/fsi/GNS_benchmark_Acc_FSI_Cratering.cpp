@@ -105,7 +105,8 @@ bool GetProblemSpecs(int argc,
 
     // Per-trajectory overrides (set by shell script for each trajectory)
     cli.AddOption<std::string>("Output", "output_folder", "Output folder name", "");
-    cli.AddOption<double>("Geometry", "sphere_density", "Sphere density (overrides YAML)", std::to_string(sphere_density));
+    cli.AddOption<double>("Geometry", "sphere_density", "Sphere density (overrides YAML)",
+                          std::to_string(sphere_density));
     cli.AddOption<double>("Geometry", "sphere_radius", "Sphere radius (overrides YAML)", std::to_string(sphere_radius));
     cli.AddOption<int>("Random", "random_seed", "Random seed (0=use time)", std::to_string(random_seed));
 
@@ -298,29 +299,27 @@ int main(int argc, char* argv[]) {
     ChVector3d fluid_box_half(0.048, 0.048, 0.0225);  // Half dimensions (m)
 
     // Rigid body position parameters
-    bool randomize_rigid_pos = false;           // If true, randomize position
-    ChVector3d rigid_pos(0.0, 0.0, 0.0);       // Initial position (m) - will be calculated if not randomized
+    bool randomize_rigid_pos = false;              // If true, randomize position
+    ChVector3d rigid_pos(0.0, 0.0, 0.0);           // Initial position (m) - will be calculated if not randomized
     ChVector3d rigid_pos_min(-0.05, -0.03, 0.15);  // Min position (m)
     ChVector3d rigid_pos_max(0.05, 0.03, 0.20);    // Max position (m)
 
     // Rigid body velocity parameters
-    bool randomize_rigid_vel = false;              // If true, randomize velocity
-    ChVector3d rigid_vel(0.0, 0.0, 0.0);          // Initial velocity (m/s)
-    ChVector3d rigid_vel_min(-0.5, -0.5, -2.0);   // Min velocity (m/s)
-    ChVector3d rigid_vel_max(0.5, 0.5, -0.5);     // Max velocity (m/s)
+    bool randomize_rigid_vel = false;            // If true, randomize velocity
+    ChVector3d rigid_vel(0.0, 0.0, 0.0);         // Initial velocity (m/s)
+    ChVector3d rigid_vel_min(-0.5, -0.5, -2.0);  // Min velocity (m/s)
+    ChVector3d rigid_vel_max(0.5, 0.5, -0.5);    // Max velocity (m/s)
 
-    int random_seed = 0;         // Random seed (0 = use system time)
+    int random_seed = 0;  // Random seed (0 = use system time)
 
     // Output folder name
     std::string output_folder = "";  // Empty = auto-generate from parameters
 
     // Parse command-line arguments
-    if (!GetProblemSpecs(argc, argv, t_end, ps_freq, output_fps, sphere_density, sphere_radius, Hdrop, initial_spacing, d0_multiplier, time_step,
-                         fluid_box_center, fluid_box_half,
-                         randomize_rigid_pos, rigid_pos, rigid_pos_min, rigid_pos_max,
-                         randomize_rigid_vel, rigid_vel, rigid_vel_min, rigid_vel_max,
-                         random_seed, output_folder,
-                         boundary_type, viscosity_type, kernel_type)) {
+    if (!GetProblemSpecs(argc, argv, t_end, ps_freq, output_fps, sphere_density, sphere_radius, Hdrop, initial_spacing,
+                         d0_multiplier, time_step, fluid_box_center, fluid_box_half, randomize_rigid_pos, rigid_pos,
+                         rigid_pos_min, rigid_pos_max, randomize_rigid_vel, rigid_vel, rigid_vel_min, rigid_vel_max,
+                         random_seed, output_folder, boundary_type, viscosity_type, kernel_type)) {
         return 1;
     }
 
@@ -334,22 +333,22 @@ int main(int argc, char* argv[]) {
 
         // Randomize position if enabled
         if (randomize_rigid_pos) {
-            rigid_pos = rigid_pos_min + ChVector3d(
-                (std::rand() / (double)RAND_MAX) * (rigid_pos_max.x() - rigid_pos_min.x()),
-                (std::rand() / (double)RAND_MAX) * (rigid_pos_max.y() - rigid_pos_min.y()),
-                (std::rand() / (double)RAND_MAX) * (rigid_pos_max.z() - rigid_pos_min.z())
-            );
-            std::cout << "Randomized position: (" << rigid_pos.x() << ", " << rigid_pos.y() << ", " << rigid_pos.z() << ") m" << std::endl;
+            rigid_pos =
+                rigid_pos_min + ChVector3d((std::rand() / (double)RAND_MAX) * (rigid_pos_max.x() - rigid_pos_min.x()),
+                                           (std::rand() / (double)RAND_MAX) * (rigid_pos_max.y() - rigid_pos_min.y()),
+                                           (std::rand() / (double)RAND_MAX) * (rigid_pos_max.z() - rigid_pos_min.z()));
+            std::cout << "Randomized position: (" << rigid_pos.x() << ", " << rigid_pos.y() << ", " << rigid_pos.z()
+                      << ") m" << std::endl;
         }
 
         // Randomize velocity if enabled
         if (randomize_rigid_vel) {
-            rigid_vel = rigid_vel_min + ChVector3d(
-                (std::rand() / (double)RAND_MAX) * (rigid_vel_max.x() - rigid_vel_min.x()),
-                (std::rand() / (double)RAND_MAX) * (rigid_vel_max.y() - rigid_vel_min.y()),
-                (std::rand() / (double)RAND_MAX) * (rigid_vel_max.z() - rigid_vel_min.z())
-            );
-            std::cout << "Randomized velocity: (" << rigid_vel.x() << ", " << rigid_vel.y() << ", " << rigid_vel.z() << ") m/s" << std::endl;
+            rigid_vel =
+                rigid_vel_min + ChVector3d((std::rand() / (double)RAND_MAX) * (rigid_vel_max.x() - rigid_vel_min.x()),
+                                           (std::rand() / (double)RAND_MAX) * (rigid_vel_max.y() - rigid_vel_min.y()),
+                                           (std::rand() / (double)RAND_MAX) * (rigid_vel_max.z() - rigid_vel_min.z()));
+            std::cout << "Randomized velocity: (" << rigid_vel.x() << ", " << rigid_vel.y() << ", " << rigid_vel.z()
+                      << ") m/s" << std::endl;
         }
     }
 
@@ -381,9 +380,9 @@ int main(int argc, char* argv[]) {
         ChVector3d sphere_min = rigid_pos - ChVector3d(sphere_radius, sphere_radius, sphere_radius);
         ChVector3d sphere_max = rigid_pos + ChVector3d(sphere_radius, sphere_radius, sphere_radius);
 
-        bool sphere_fluid_overlap = !(sphere_max.x() < fluid_min.x() || sphere_min.x() > fluid_max.x() ||
-                                       sphere_max.y() < fluid_min.y() || sphere_min.y() > fluid_max.y() ||
-                                       sphere_max.z() < fluid_min.z() || sphere_min.z() > fluid_max.z());
+        bool sphere_fluid_overlap =
+            !(sphere_max.x() < fluid_min.x() || sphere_min.x() > fluid_max.x() || sphere_max.y() < fluid_min.y() ||
+              sphere_min.y() > fluid_max.y() || sphere_max.z() < fluid_min.z() || sphere_min.z() > fluid_max.z());
 
         if (sphere_fluid_overlap) {
             std::cout << "Warning: Sphere overlaps with fluid box!" << std::endl;
@@ -396,11 +395,10 @@ int main(int argc, char* argv[]) {
 
         double safety_margin = initial_spacing;  // Safety margin to prevent collision
 
-        bool sphere_boundary_overlap = (sphere_min.x() < boundary_min.x() + safety_margin ||
-                                         sphere_max.x() > boundary_max.x() - safety_margin ||
-                                         sphere_min.y() < boundary_min.y() + safety_margin ||
-                                         sphere_max.y() > boundary_max.y() - safety_margin ||
-                                         sphere_min.z() < boundary_min.z() + safety_margin);
+        bool sphere_boundary_overlap =
+            (sphere_min.x() < boundary_min.x() + safety_margin || sphere_max.x() > boundary_max.x() - safety_margin ||
+             sphere_min.y() < boundary_min.y() + safety_margin || sphere_max.y() > boundary_max.y() - safety_margin ||
+             sphere_min.z() < boundary_min.z() + safety_margin);
 
         if (sphere_boundary_overlap) {
             std::cout << "Warning: Sphere too close to boundary walls!" << std::endl;
@@ -408,11 +406,10 @@ int main(int argc, char* argv[]) {
         }
 
         // Check 3: Fluid box vs Boundary walls
-        bool fluid_boundary_overlap = (fluid_min.x() < boundary_min.x() + safety_margin ||
-                                        fluid_max.x() > boundary_max.x() - safety_margin ||
-                                        fluid_min.y() < boundary_min.y() + safety_margin ||
-                                        fluid_max.y() > boundary_max.y() - safety_margin ||
-                                        fluid_min.z() < boundary_min.z() + safety_margin);
+        bool fluid_boundary_overlap =
+            (fluid_min.x() < boundary_min.x() + safety_margin || fluid_max.x() > boundary_max.x() - safety_margin ||
+             fluid_min.y() < boundary_min.y() + safety_margin || fluid_max.y() > boundary_max.y() - safety_margin ||
+             fluid_min.z() < boundary_min.z() + safety_margin);
 
         if (fluid_boundary_overlap) {
             std::cout << "Warning: Fluid box too close to boundary walls!" << std::endl;
@@ -423,7 +420,8 @@ int main(int argc, char* argv[]) {
         if (!has_overlap) {
             valid_configuration = true;
             if (resample_count > 0) {
-                std::cout << "Valid configuration found after " << resample_count << " resampling attempts" << std::endl;
+                std::cout << "Valid configuration found after " << resample_count << " resampling attempts"
+                          << std::endl;
             }
         } else {
             // Resample if randomization is enabled
@@ -433,20 +431,18 @@ int main(int argc, char* argv[]) {
 
                 // Resample position if randomized
                 if (randomize_rigid_pos) {
-                    rigid_pos = rigid_pos_min + ChVector3d(
-                        (std::rand() / (double)RAND_MAX) * (rigid_pos_max.x() - rigid_pos_min.x()),
-                        (std::rand() / (double)RAND_MAX) * (rigid_pos_max.y() - rigid_pos_min.y()),
-                        (std::rand() / (double)RAND_MAX) * (rigid_pos_max.z() - rigid_pos_min.z())
-                    );
+                    rigid_pos = rigid_pos_min +
+                                ChVector3d((std::rand() / (double)RAND_MAX) * (rigid_pos_max.x() - rigid_pos_min.x()),
+                                           (std::rand() / (double)RAND_MAX) * (rigid_pos_max.y() - rigid_pos_min.y()),
+                                           (std::rand() / (double)RAND_MAX) * (rigid_pos_max.z() - rigid_pos_min.z()));
                 }
 
                 // Resample velocity if randomized
                 if (randomize_rigid_vel) {
-                    rigid_vel = rigid_vel_min + ChVector3d(
-                        (std::rand() / (double)RAND_MAX) * (rigid_vel_max.x() - rigid_vel_min.x()),
-                        (std::rand() / (double)RAND_MAX) * (rigid_vel_max.y() - rigid_vel_min.y()),
-                        (std::rand() / (double)RAND_MAX) * (rigid_vel_max.z() - rigid_vel_min.z())
-                    );
+                    rigid_vel = rigid_vel_min +
+                                ChVector3d((std::rand() / (double)RAND_MAX) * (rigid_vel_max.x() - rigid_vel_min.x()),
+                                           (std::rand() / (double)RAND_MAX) * (rigid_vel_max.y() - rigid_vel_min.y()),
+                                           (std::rand() / (double)RAND_MAX) * (rigid_vel_max.z() - rigid_vel_min.z()));
                 }
             } else {
                 // Cannot resample without randomization enabled
@@ -459,17 +455,21 @@ int main(int argc, char* argv[]) {
 
     // Check if we exceeded maximum attempts
     if (!valid_configuration) {
-        std::cerr << "Error: Could not find valid configuration after " << MAX_RESAMPLE_ATTEMPTS << " attempts!" << std::endl;
+        std::cerr << "Error: Could not find valid configuration after " << MAX_RESAMPLE_ATTEMPTS << " attempts!"
+                  << std::endl;
         std::cerr << "Please adjust the parameter ranges to allow valid configurations." << std::endl;
         return 1;
     }
 
     std::cout << "Geometry validation passed!" << std::endl;
-    std::cout << "Final rigid body position: (" << rigid_pos.x() << ", " << rigid_pos.y() << ", " << rigid_pos.z() << ")" << std::endl;
-    std::cout << "Final rigid body velocity: (" << rigid_vel.x() << ", " << rigid_vel.y() << ", " << rigid_vel.z() << ")" << std::endl;
+    std::cout << "Final rigid body position: (" << rigid_pos.x() << ", " << rigid_pos.y() << ", " << rigid_pos.z()
+              << ")" << std::endl;
+    std::cout << "Final rigid body velocity: (" << rigid_vel.x() << ", " << rigid_vel.y() << ", " << rigid_vel.z()
+              << ")" << std::endl;
 
     // Create a physics system
     ChSystemSMC sysMBS;
+    sysMBS.SetCollisionSystemType(ChCollisionSystem::Type::BULLET);
 
     // Create a fluid system
     ChFsiFluidSystemSPH sysSPH;
@@ -548,16 +548,18 @@ int main(int argc, char* argv[]) {
     chrono::utils::ChGridSampler<> sampler(init_spacing);
     std::vector<ChVector3d> points = sampler.SampleBox(fluid_box_center, fluid_box_half);
 
-    std::cout << "Fluid box center: (" << fluid_box_center.x() << ", " << fluid_box_center.y() << ", " << fluid_box_center.z() << ")" << std::endl;
-    std::cout << "Fluid box half dimensions: (" << fluid_box_half.x() << ", " << fluid_box_half.y() << ", " << fluid_box_half.z() << ")" << std::endl;
+    std::cout << "Fluid box center: (" << fluid_box_center.x() << ", " << fluid_box_center.y() << ", "
+              << fluid_box_center.z() << ")" << std::endl;
+    std::cout << "Fluid box half dimensions: (" << fluid_box_half.x() << ", " << fluid_box_half.y() << ", "
+              << fluid_box_half.z() << ")" << std::endl;
     std::cout << "Generated " << points.size() << " SPH particles" << std::endl;
 
     // Add SPH particles to the fluid system
     double gz = std::abs(sysSPH.GetGravitationalAcceleration().z());
     // each particle's initial pressure and density based on depth
     for (const auto& p : points) {
-        double pre_ini = 0; // assign homogeneous initial pressure
-        double rho_ini = 1800; // assign homogeneous initial density
+        double pre_ini = 0;     // assign homogeneous initial pressure
+        double rho_ini = 1800;  // assign homogeneous initial density
         sysSPH.AddSPHParticle(p, rho_ini, pre_ini, sysSPH.GetViscosity(), ChVector3d(0));
     }
 
@@ -573,15 +575,14 @@ int main(int argc, char* argv[]) {
     box->SetPos(ChVector3d(0.0, 0.0, 0.0));
     box->SetRot(ChQuaternion<>(1, 0, 0, 0));
     box->SetFixed(true);
-    sysMBS.AddBody(box);
-
     // Add collision geometry for the container walls
     chrono::utils::AddBoxContainer(box, cmaterial,                                 //
                                    ChFrame<>(ChVector3d(0, 0, bzDim / 2), QUNIT),  //
-                                   ChVector3d(bxDim, byDim, bzDim), 0.1,           //
+                                   ChVector3d(bxDim, byDim, bzDim), 0.01,          //
                                    ChVector3i(2, 2, -1),                           //
-                                   false);
+                                   true);
     box->EnableCollision(true);
+    sysMBS.AddBody(box);
 
     // Add BCE particles attached on the walls into FSI system
     sysSPH.AddBoxContainerBCE(box,                                            //
@@ -595,23 +596,24 @@ int main(int argc, char* argv[]) {
     auto inertia = mass * ChSphere::GetGyration(sphere_radius);
 
     // Calculate default velocity if not randomized/specified
+    double impact_vel = 0.0;
     if (!randomize_rigid_vel && rigid_vel.z() == 0.0) {
         // Use default velocity based on Hdrop (impact velocity)
-        double impact_vel = std::sqrt(2 * Hdrop * g);
+        impact_vel = std::sqrt(2 * Hdrop * g);
         rigid_vel = ChVector3d(0.0, 0.0, -impact_vel);  // Negative for downward
     }
 
     // Position and velocity are already set by validation loop above
     auto sphere = chrono_types::make_shared<ChBody>();
-    sysMBS.AddBody(sphere);
     sphere->SetPos(rigid_pos);
     sphere->SetPosDt(rigid_vel);
     sphere->SetMass(mass);
     sphere->SetInertia(inertia);
 
-    chrono::utils::AddSphereGeometry(sphere.get(), cmaterial, sphere_radius);
+    chrono::utils::AddSphereGeometry(sphere.get(), cmaterial, sphere_radius, ChVector3d(0, 0, 0), QUNIT, true);
     sphere->EnableCollision(true);
-    sphere->GetCollisionModel()->SetSafeMargin(init_spacing);
+    // sphere->GetCollisionModel()->SetSafeMargin(init_spacing);
+    sysMBS.AddBody(sphere);
 
     sysFSI.AddFsiBody(sphere);
     sysSPH.AddSphereBCE(sphere, ChFrame<>(VNULL, QUNIT), sphere_radius, true, true);
@@ -715,7 +717,7 @@ int main(int argc, char* argv[]) {
     int out_frame = 0;
     int render_frame = 0;
     double dT = sysFSI.GetStepSizeCFD();
-    
+
     double rtf_average = 0.0;
     unsigned int rtf_count = 0;
 
@@ -772,7 +774,7 @@ int main(int argc, char* argv[]) {
     std::cout << "\nSimulation time: " << timer() << " seconds\n" << std::endl;
     std::cout << "Average RTF: " << rtf_average << std::endl;
     std::cout << "Simulation finished" << std::endl;
-    
+
     // Write runtime information and all parameters to a file
     if (output) {
         std::ofstream runtime_file(out_dir + "/runtime.txt");
@@ -801,28 +803,36 @@ int main(int argc, char* argv[]) {
 
         // Fluid box parameters
         runtime_file << "=== Fluid Box Parameters ===" << std::endl;
-        runtime_file << "fluid_box_center: (" << fluid_box_center.x() << ", " << fluid_box_center.y() << ", " << fluid_box_center.z() << ") m" << std::endl;
-        runtime_file << "fluid_box_half: (" << fluid_box_half.x() << ", " << fluid_box_half.y() << ", " << fluid_box_half.z() << ") m" << std::endl;
+        runtime_file << "fluid_box_center: (" << fluid_box_center.x() << ", " << fluid_box_center.y() << ", "
+                     << fluid_box_center.z() << ") m" << std::endl;
+        runtime_file << "fluid_box_half: (" << fluid_box_half.x() << ", " << fluid_box_half.y() << ", "
+                     << fluid_box_half.z() << ") m" << std::endl;
         runtime_file << "num_sph_particles: " << points.size() << std::endl;
         runtime_file << std::endl;
 
         // Rigid body position parameters
         runtime_file << "=== Rigid Body Position ===" << std::endl;
         runtime_file << "randomize_rigid_pos: " << (randomize_rigid_pos ? "true" : "false") << std::endl;
-        runtime_file << "rigid_pos: (" << rigid_pos.x() << ", " << rigid_pos.y() << ", " << rigid_pos.z() << ") m" << std::endl;
+        runtime_file << "rigid_pos: (" << rigid_pos.x() << ", " << rigid_pos.y() << ", " << rigid_pos.z() << ") m"
+                     << std::endl;
         if (randomize_rigid_pos) {
-            runtime_file << "rigid_pos_min: (" << rigid_pos_min.x() << ", " << rigid_pos_min.y() << ", " << rigid_pos_min.z() << ") m" << std::endl;
-            runtime_file << "rigid_pos_max: (" << rigid_pos_max.x() << ", " << rigid_pos_max.y() << ", " << rigid_pos_max.z() << ") m" << std::endl;
+            runtime_file << "rigid_pos_min: (" << rigid_pos_min.x() << ", " << rigid_pos_min.y() << ", "
+                         << rigid_pos_min.z() << ") m" << std::endl;
+            runtime_file << "rigid_pos_max: (" << rigid_pos_max.x() << ", " << rigid_pos_max.y() << ", "
+                         << rigid_pos_max.z() << ") m" << std::endl;
         }
         runtime_file << std::endl;
 
         // Rigid body velocity parameters
         runtime_file << "=== Rigid Body Velocity ===" << std::endl;
         runtime_file << "randomize_rigid_vel: " << (randomize_rigid_vel ? "true" : "false") << std::endl;
-        runtime_file << "rigid_vel: (" << rigid_vel.x() << ", " << rigid_vel.y() << ", " << rigid_vel.z() << ") m/s" << std::endl;
+        runtime_file << "rigid_vel: (" << rigid_vel.x() << ", " << rigid_vel.y() << ", " << rigid_vel.z() << ") m/s"
+                     << std::endl;
         if (randomize_rigid_vel) {
-            runtime_file << "rigid_vel_min: (" << rigid_vel_min.x() << ", " << rigid_vel_min.y() << ", " << rigid_vel_min.z() << ") m/s" << std::endl;
-            runtime_file << "rigid_vel_max: (" << rigid_vel_max.x() << ", " << rigid_vel_max.y() << ", " << rigid_vel_max.z() << ") m/s" << std::endl;
+            runtime_file << "rigid_vel_min: (" << rigid_vel_min.x() << ", " << rigid_vel_min.y() << ", "
+                         << rigid_vel_min.z() << ") m/s" << std::endl;
+            runtime_file << "rigid_vel_max: (" << rigid_vel_max.x() << ", " << rigid_vel_max.y() << ", "
+                         << rigid_vel_max.z() << ") m/s" << std::endl;
         }
         if (randomize_rigid_pos || randomize_rigid_vel) {
             runtime_file << "random_seed: " << random_seed << std::endl;
