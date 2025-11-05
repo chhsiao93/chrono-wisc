@@ -3,7 +3,7 @@
 
 simulation:
   t_end: 1.0
-  time_step: 5.0e-5
+  time_step: 1.0e-4
   ps_freq: 1
   output_fps: 400
 
@@ -12,7 +12,7 @@ geometry:
     min: 2200
     max: 2200
   sphere_radius:
-    min: 0.008
+    min: 0.005
     max: 0.015
   initial_spacing: 0.0025
   Hdrop: 0.2
@@ -21,7 +21,18 @@ geometry:
   # Note: Boundary box is 0.1x0.1, so fluid must fit within [-0.05, 0.05] with safety margin
   fluid_box:
     center: [0.0, 0.0, 0.02]
-    half_dim: [0.03, 0.03, 0.017]
+    half_dim: [0.02, 0.02, 0.017]
+
+  # Fluid box randomization ranges
+  fluid_box_center:
+    randomize: true
+    min: [-0.01, -0.01, 0.015]
+    max: [0.01, 0.01, 0.025]
+
+  fluid_box_half_dim:
+    randomize: true
+    min: [0.015, 0.015, 0.012]
+    max: [0.025, 0.025, 0.020]
 
 physics:
   boundary_type: "adami"
@@ -31,16 +42,21 @@ physics:
 
 rigid_position:
   randomize: true
-  min: [0.01, -0.015, 0.06]
-  max: [0.01, 0.015, 0.08]
+  min: [-0.015, -0.015, 0.06]
+  max: [0.015, 0.015, 0.08]
 
 rigid_velocity:
   randomize: true
-  min: [0.35, -0.15, -0.5]
-  max: [0.35, 0.15, 0.0]
+  min: [-0.2, -0.2, -0.2]
+  max: [0.2, 0.2, 0.2]
+
+fluid_velocity:
+  randomize: true
+  min: [-0.2, -0.2, -0.2]
+  max: [0.2, 0.2, 0.2]
 
 dataset:
-  num_trajectories: 1
+  num_trajectories: 100
   output_base_dir: "GNS_dataset"
   random_seed_base: 0
 
@@ -48,7 +64,7 @@ rendering:
   auto_render: true
   width: 1280
   height: 720
-  fps: 10
+  fps: 40
   format: "mp4"
   cleanup_frames: true
   python_venv: ""
