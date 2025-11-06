@@ -25,6 +25,7 @@ set(DEMOS ${DEMOS}
    benchmark_Acc_FSI_Viper_SingleWheel
    benchmark_Acc_FSI_Rassor_SingleDrum
    GNS_benchmark_Acc_FSI_Cratering
+   GNS_demo_FSI_AngleRepose
 )
 
 if(CH_ENABLE_MODULE_PARDISO_MKL)

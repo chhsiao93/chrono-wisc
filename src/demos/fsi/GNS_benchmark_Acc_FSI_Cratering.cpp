@@ -652,7 +652,6 @@ int main(int argc, char* argv[]) {
     sysMBS.SetGravitationalAcceleration(sysSPH.GetGravitationalAcceleration());
 
     sysFSI.SetVerbose(verbose);
-    sysSPH.SetNumProximitySearchSteps(ps_freq);
 
     // Dimension of the space domain (use values already declared in validation section)
     double fzDim = fluid_box_center.z() * 2;  // Calculate fzDim from center if needed
