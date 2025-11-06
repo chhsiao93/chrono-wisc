@@ -26,7 +26,7 @@
 #include <iomanip>
 #include <fstream>
 
-#include "chrono/physics/ChSystemSMC.h"
+#include "chrono/physics/ChSystemNSC.h"
 #include "chrono/assets/ChVisualSystem.h"
 #include "chrono/utils/ChUtilsCreators.h"
 #include "chrono/utils/ChUtilsGenerators.h"
@@ -328,7 +328,7 @@ int main(int argc, char* argv[]) {
     double sphere_density = 700;
     double sphere_radius = 0.0125;  // Default sphere radius (can be changed via CLI)
     double Hdrop = 0.2;
-    bool render = false;
+    bool render = true;
     double render_fps = 400;
     std::string boundary_type = "adami";
     std::string viscosity_type = "artificial_unilateral";
@@ -342,20 +342,20 @@ int main(int argc, char* argv[]) {
     ChVector3d fluid_box_half(0.048, 0.048, 0.0225);  // Half dimensions (m)
 
     // Fluid box center randomization parameters
-    bool randomize_fluid_center = false;              // If true, randomize fluid box center
+    bool randomize_fluid_center = false;               // If true, randomize fluid box center
     ChVector3d fluid_center_min(-0.01, -0.01, 0.015);  // Min fluid box center (m)
     ChVector3d fluid_center_max(0.01, 0.01, 0.025);    // Max fluid box center (m)
 
     // Fluid box half_dim randomization parameters
-    bool randomize_fluid_half = false;                // If true, randomize fluid box half dimensions
-    ChVector3d fluid_half_min(0.015, 0.015, 0.012);   // Min fluid box half dimensions (m)
-    ChVector3d fluid_half_max(0.025, 0.025, 0.020);   // Max fluid box half dimensions (m)
+    bool randomize_fluid_half = false;               // If true, randomize fluid box half dimensions
+    ChVector3d fluid_half_min(0.015, 0.015, 0.012);  // Min fluid box half dimensions (m)
+    ChVector3d fluid_half_max(0.025, 0.025, 0.020);  // Max fluid box half dimensions (m)
 
     // Fluid velocity parameters
-    bool randomize_fluid_vel = false;                // If true, randomize fluid velocity
-    ChVector3d fluid_vel(0.0, 0.0, 0.0);             // Initial fluid velocity (m/s)
-    ChVector3d fluid_vel_min(-0.1, -0.1, -0.1);      // Min fluid velocity (m/s)
-    ChVector3d fluid_vel_max(0.1, 0.1, 0.1);         // Max fluid velocity (m/s)
+    bool randomize_fluid_vel = false;            // If true, randomize fluid velocity
+    ChVector3d fluid_vel(0.0, 0.0, 0.0);         // Initial fluid velocity (m/s)
+    ChVector3d fluid_vel_min(-0.1, -0.1, -0.1);  // Min fluid velocity (m/s)
+    ChVector3d fluid_vel_max(0.1, 0.1, 0.1);     // Max fluid velocity (m/s)
 
     // Rigid body position parameters
     bool randomize_rigid_pos = false;              // If true, randomize position
@@ -385,7 +385,8 @@ int main(int argc, char* argv[]) {
     }
 
     // Initialize random number generator if needed
-    if (randomize_fluid_center || randomize_fluid_half || randomize_fluid_vel || randomize_rigid_pos || randomize_rigid_vel) {
+    if (randomize_fluid_center || randomize_fluid_half || randomize_fluid_vel || randomize_rigid_pos ||
+        randomize_rigid_vel) {
         if (random_seed == 0) {
             random_seed = static_cast<int>(std::time(nullptr));
         }
@@ -395,21 +396,22 @@ int main(int argc, char* argv[]) {
         // Randomize fluid box center if enabled
         if (randomize_fluid_center) {
             fluid_box_center =
-                fluid_center_min + ChVector3d((std::rand() / (double)RAND_MAX) * (fluid_center_max.x() - fluid_center_min.x()),
-                                              (std::rand() / (double)RAND_MAX) * (fluid_center_max.y() - fluid_center_min.y()),
-                                              (std::rand() / (double)RAND_MAX) * (fluid_center_max.z() - fluid_center_min.z()));
-            std::cout << "Randomized fluid_box_center: (" << fluid_box_center.x() << ", " << fluid_box_center.y() << ", " << fluid_box_center.z()
-                      << ") m" << std::endl;
+                fluid_center_min +
+                ChVector3d((std::rand() / (double)RAND_MAX) * (fluid_center_max.x() - fluid_center_min.x()),
+                           (std::rand() / (double)RAND_MAX) * (fluid_center_max.y() - fluid_center_min.y()),
+                           (std::rand() / (double)RAND_MAX) * (fluid_center_max.z() - fluid_center_min.z()));
+            std::cout << "Randomized fluid_box_center: (" << fluid_box_center.x() << ", " << fluid_box_center.y()
+                      << ", " << fluid_box_center.z() << ") m" << std::endl;
         }
 
         // Randomize fluid box half dimensions if enabled
         if (randomize_fluid_half) {
-            fluid_box_half =
-                fluid_half_min + ChVector3d((std::rand() / (double)RAND_MAX) * (fluid_half_max.x() - fluid_half_min.x()),
-                                            (std::rand() / (double)RAND_MAX) * (fluid_half_max.y() - fluid_half_min.y()),
-                                            (std::rand() / (double)RAND_MAX) * (fluid_half_max.z() - fluid_half_min.z()));
-            std::cout << "Randomized fluid_box_half: (" << fluid_box_half.x() << ", " << fluid_box_half.y() << ", " << fluid_box_half.z()
-                      << ") m" << std::endl;
+            fluid_box_half = fluid_half_min +
+                             ChVector3d((std::rand() / (double)RAND_MAX) * (fluid_half_max.x() - fluid_half_min.x()),
+                                        (std::rand() / (double)RAND_MAX) * (fluid_half_max.y() - fluid_half_min.y()),
+                                        (std::rand() / (double)RAND_MAX) * (fluid_half_max.z() - fluid_half_min.z()));
+            std::cout << "Randomized fluid_box_half: (" << fluid_box_half.x() << ", " << fluid_box_half.y() << ", "
+                      << fluid_box_half.z() << ") m" << std::endl;
         }
 
         // Randomize fluid velocity if enabled
@@ -516,24 +518,27 @@ int main(int argc, char* argv[]) {
             }
         } else {
             // Resample if randomization is enabled
-            if (randomize_fluid_center || randomize_fluid_half || randomize_fluid_vel || randomize_rigid_pos || randomize_rigid_vel) {
+            if (randomize_fluid_center || randomize_fluid_half || randomize_fluid_vel || randomize_rigid_pos ||
+                randomize_rigid_vel) {
                 resample_count++;
                 std::cout << "Resampling attempt " << resample_count << "..." << std::endl;
 
                 // Resample fluid box center if randomized
                 if (randomize_fluid_center) {
-                    fluid_box_center = fluid_center_min +
-                                ChVector3d((std::rand() / (double)RAND_MAX) * (fluid_center_max.x() - fluid_center_min.x()),
-                                           (std::rand() / (double)RAND_MAX) * (fluid_center_max.y() - fluid_center_min.y()),
-                                           (std::rand() / (double)RAND_MAX) * (fluid_center_max.z() - fluid_center_min.z()));
+                    fluid_box_center =
+                        fluid_center_min +
+                        ChVector3d((std::rand() / (double)RAND_MAX) * (fluid_center_max.x() - fluid_center_min.x()),
+                                   (std::rand() / (double)RAND_MAX) * (fluid_center_max.y() - fluid_center_min.y()),
+                                   (std::rand() / (double)RAND_MAX) * (fluid_center_max.z() - fluid_center_min.z()));
                 }
 
                 // Resample fluid box half dimensions if randomized
                 if (randomize_fluid_half) {
-                    fluid_box_half = fluid_half_min +
-                                ChVector3d((std::rand() / (double)RAND_MAX) * (fluid_half_max.x() - fluid_half_min.x()),
-                                           (std::rand() / (double)RAND_MAX) * (fluid_half_max.y() - fluid_half_min.y()),
-                                           (std::rand() / (double)RAND_MAX) * (fluid_half_max.z() - fluid_half_min.z()));
+                    fluid_box_half =
+                        fluid_half_min +
+                        ChVector3d((std::rand() / (double)RAND_MAX) * (fluid_half_max.x() - fluid_half_min.x()),
+                                   (std::rand() / (double)RAND_MAX) * (fluid_half_max.y() - fluid_half_min.y()),
+                                   (std::rand() / (double)RAND_MAX) * (fluid_half_max.z() - fluid_half_min.z()));
                 }
 
                 // Resample fluid velocity if randomized
@@ -583,7 +588,7 @@ int main(int argc, char* argv[]) {
               << ")" << std::endl;
 
     // Create a physics system
-    ChSystemSMC sysMBS;
+    ChSystemNSC sysMBS;
     sysMBS.SetCollisionSystemType(ChCollisionSystem::Type::BULLET);
 
     // Create a fluid system
@@ -678,14 +683,12 @@ int main(int argc, char* argv[]) {
         sysSPH.AddSPHParticle(p, rho_ini, pre_ini, sysSPH.GetViscosity(), fluid_vel);
     }
 
-    std::cout << "Fluid initial velocity: (" << fluid_vel.x() << ", " << fluid_vel.y() << ", " << fluid_vel.z() << ") m/s" << std::endl;
+    std::cout << "Fluid initial velocity: (" << fluid_vel.x() << ", " << fluid_vel.y() << ", " << fluid_vel.z()
+              << ") m/s" << std::endl;
 
     // Create MBD and BCE particles for the solid domain
-    auto cmaterial = chrono_types::make_shared<ChContactMaterialSMC>();
-    cmaterial->SetYoungModulus(1e8);
+    auto cmaterial = chrono_types::make_shared<ChContactMaterialNSC>();
     cmaterial->SetFriction(0.3f);
-    cmaterial->SetRestitution(0.05f);
-    cmaterial->SetAdhesion(0);
 
     // Create a container
     auto box = chrono_types::make_shared<ChBody>();
